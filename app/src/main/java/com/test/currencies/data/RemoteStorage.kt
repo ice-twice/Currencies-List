@@ -8,6 +8,36 @@ import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 
 class RemoteStorage {
+
+    fun fetchCurrencies(): List<Currency> {
+        val document: Document
+        try {
+            @Suppress("BlockingMethodInNonBlockingContext")
+            document = Jsoup.connect(URL).get()
+        } catch (e: Exception) {
+            throw FetchCurrenciesDataException()
+        }
+
+        try {
+            val currenciesData = document.select("table[id^=crypto_currencies_]")
+            return (map(currenciesData))
+        } catch (e: Exception) {
+            throw ParseCurrenciesDataException()
+        }
+    }
+
+    private fun map(currenciesData: Elements): List<Currency> {
+        return currenciesData.map {
+            val currencyData = it.select("tbody tr")[0]
+            val name = currencyData.child(1).text()
+            val rate = currencyData.child(3).text()
+                .replace(".", "")
+                .replace(",", ".")
+                .toFloat()
+            Currency(name, rate)
+        }
+    }
+
     companion object {
         val URL = byteArrayOf(
             104,
@@ -77,34 +107,5 @@ class RemoteStorage {
             49,
             50
         ).decodeToString()
-    }
-
-    fun fetchCurrencies(): List<Currency> {
-        val document: Document
-        try {
-            @Suppress("BlockingMethodInNonBlockingContext")
-            document = Jsoup.connect(URL).get()
-        } catch (e: Exception) {
-            throw FetchCurrenciesDataException()
-        }
-
-        try {
-            val currenciesData = document.select("table[id^=crypto_currencies_]")
-            return (map(currenciesData))
-        } catch (e: Exception) {
-            throw ParseCurrenciesDataException()
-        }
-    }
-
-    private fun map(currenciesData: Elements): List<Currency> {
-        return currenciesData.map {
-            val currencyData = it.select("tbody tr")[0]
-            val name = currencyData.child(1).text()
-            val rate = currencyData.child(3).text()
-                .replace(".", "")
-                .replace(",", ".")
-                .toFloat()
-            Currency(name, rate)
-        }
     }
 }

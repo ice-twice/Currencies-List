@@ -2,10 +2,10 @@ package com.test.currencies.data.local
 
 import com.test.currencies.domain.Currency
 
-class LocalStorage(private val db: CurrencyDatabase) {
+class LocalStorage(private val currencyDao: CurrencyDao) {
 
     fun fetchCurrencies(): List<Currency> {
-        return db.currencyDao().getAll().map {
+        return currencyDao.getAll().map {
             Currency(it.name, it.rate)
         }
     }
@@ -13,7 +13,7 @@ class LocalStorage(private val db: CurrencyDatabase) {
     fun replaceCurrencies(currencies: List<Currency>) {
         currencies.map { CurrencyEntity(it.name, it.rate) }
             .also {
-                db.currencyDao().insertAll(it)
+                currencyDao.insertAll(it)
             }
     }
 }

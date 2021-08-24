@@ -15,6 +15,6 @@ class LocalStorageModule {
     @ActivityRetainedScoped
     @Provides
     fun provide(currencyDatabase: CurrencyDatabase): LocalStorage {
-        return LocalStorage(currencyDatabase)
+        return LocalStorage(currencyDatabase.currencyDao())
     }
 }
