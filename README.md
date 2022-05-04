@@ -7,7 +7,7 @@ The app is able to download a currencies list from a remote source, show it on t
 Data from the cache is loaded every time if it’s less than 20 seconds from the last successful request to the remote source.
 
 Stack:
-Clean Architecture, Navigation, View Binding, View Model, Live Data, Room, Hilt, Jsoup, Coroutines, LeakCanary.
+Clean Architecture, Navigation, View Binding, View Model, Room, Hilt, Jsoup, Coroutines, LeakCanary.
  
 <br>
 <div>
