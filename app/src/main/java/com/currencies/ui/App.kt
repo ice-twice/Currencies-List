@@ -36,7 +36,7 @@ class App : Application() {
                 .detectSetUserVisibleHint()
                 .detectTargetFragmentUsage()
                 .detectWrongFragmentContainer()
-                .penaltyDeath()
+                .penaltyLog()
                 .build()
         }
     }

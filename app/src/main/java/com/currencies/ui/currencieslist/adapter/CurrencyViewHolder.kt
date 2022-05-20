@@ -1,8 +1,11 @@
 package com.currencies.ui.currencieslist.adapter
 
 import android.annotation.SuppressLint
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.currencies.R
 import com.currencies.databinding.ItemCurrencyBinding
 import com.currencies.domain.Currency
 
@@ -15,5 +18,16 @@ class CurrencyViewHolder(view: View, private val onCurrencyClickedListener: (Cur
         itemCurrencyBinding.currencyName.text = currency.name
         itemCurrencyBinding.currencyRate.text = "%.2f".format(currency.rate)
         itemCurrencyBinding.root.setOnClickListener { onCurrencyClickedListener(currency) }
+    }
+
+    companion object {
+        fun create(
+            parent: ViewGroup,
+            onCurrencyClickedListener: (Currency) -> Unit
+        ): CurrencyViewHolder {
+            val view =
+                LayoutInflater.from(parent.context).inflate(R.layout.item_currency, parent, false)
+            return CurrencyViewHolder(view, onCurrencyClickedListener)
+        }
     }
 }

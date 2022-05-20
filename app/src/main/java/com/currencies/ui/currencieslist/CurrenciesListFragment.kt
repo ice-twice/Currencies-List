@@ -11,13 +11,14 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.currencies.databinding.CurrenciesListFragmentBinding
 import com.currencies.domain.Currency
 import com.currencies.ui.currencieslist.adapter.CurrenciesAdapter
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -44,6 +45,8 @@ class CurrenciesListFragment : Fragment() {
             { currency -> searchForCurrencyName(currency.name) }
         currenciesAdapter = CurrenciesAdapter(onCurrencyClickedListener)
         binding.currenciesList.adapter = currenciesAdapter
+        val decoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+        binding.currenciesList.addItemDecoration(decoration)
     }
 
     private fun searchForCurrencyName(currencyName: String) {
@@ -58,19 +61,17 @@ class CurrenciesListFragment : Fragment() {
                 val uiState = currenciesListViewModel.uiState
                 launch {
                     uiState
-                        .map { it.isLoading }
-                        .distinctUntilChanged()
-                        .collect { isLoading ->
-                            binding.swipeToRefresh.isRefreshing = isLoading
+                        .distinctUntilChangedBy { it.isLoading }
+                        .collect { uiState ->
+                            binding.swipeToRefresh.isRefreshing = uiState.isLoading
                         }
                 }
 
                 launch {
                     uiState
-                        .map { it.currencies }
-                        .distinctUntilChanged()
-                        .collect { currencies ->
-                            currenciesAdapter.submitList(currencies)
+                        .distinctUntilChangedBy { it.currencies }
+                        .collect { uiState ->
+                            currenciesAdapter.submitList(uiState.currencies)
                         }
                 }
 
