@@ -14,13 +14,14 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.currencies.databinding.CurrenciesListFragmentBinding
 import com.currencies.domain.Currency
-import com.currencies.ui.currencieslist.adapter.CurrenciesAdapter
+import com.currencies.ui.currencieslist.adapter.CurrenciesPagingAdapterNew
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -28,7 +29,7 @@ class CurrenciesListFragment : Fragment() {
     private var _binding: CurrenciesListFragmentBinding? = null
     private val binding get() = _binding!!
     private val currenciesListViewModel by viewModels<CurrenciesListViewModel>()
-    private lateinit var currenciesAdapter: CurrenciesAdapter
+    private lateinit var currenciesPagingAdapter: CurrenciesPagingAdapterNew
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -43,10 +44,13 @@ class CurrenciesListFragment : Fragment() {
     private fun setupAdapter() {
         val onCurrencyClickedListener: (Currency) -> Unit =
             { currency -> searchForCurrencyName(currency.name) }
-        currenciesAdapter = CurrenciesAdapter(onCurrencyClickedListener)
-        binding.currenciesList.adapter = currenciesAdapter
+//        currenciesAdapter = CurrenciesAdapter(onCurrencyClickedListener)
+//        binding.currenciesList.adapter = currenciesAdapter
         val decoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
         binding.currenciesList.addItemDecoration(decoration)
+
+        currenciesPagingAdapter = CurrenciesPagingAdapterNew(onCurrencyClickedListener)
+        binding.currenciesList.adapter = currenciesPagingAdapter
     }
 
     private fun searchForCurrencyName(currencyName: String) {
@@ -71,7 +75,7 @@ class CurrenciesListFragment : Fragment() {
                     uiState
                         .distinctUntilChangedBy { it.currencies }
                         .collect { uiState ->
-                            currenciesAdapter.submitList(uiState.currencies)
+//                            currenciesAdapter.submitList(uiState.currencies)
                         }
                 }
 
@@ -83,6 +87,10 @@ class CurrenciesListFragment : Fragment() {
                             Snackbar.make(binding.root, error, Snackbar.LENGTH_SHORT).show()
                             currenciesListViewModel.onErrorShowed()
                         }
+                }
+
+                currenciesListViewModel.currenciesPagingStream.collectLatest {
+                    currenciesPagingAdapter.submitData(it)
                 }
             }
         }

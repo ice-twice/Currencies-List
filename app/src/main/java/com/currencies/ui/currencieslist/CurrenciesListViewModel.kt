@@ -2,6 +2,10 @@ package com.currencies.ui.currencieslist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import com.currencies.data.paging.CurrenciesPagingRepository
+import com.currencies.domain.Currency
 import com.currencies.domain.FetchCurrenciesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,10 +16,15 @@ import javax.inject.Inject
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class CurrenciesListViewModel @Inject constructor(
-    private val fetchCurrenciesUseCase: FetchCurrenciesUseCase
+    private val fetchCurrenciesUseCase: FetchCurrenciesUseCase,
+    currenciesPagingRepository: CurrenciesPagingRepository
 ) : ViewModel() {
     val uiState = MutableStateFlow(CurrenciesListUiState())
     private val fetchCurrenciesActionFlow = MutableSharedFlow<Boolean>()
+
+    val currenciesPagingStream: Flow<PagingData<Currency>> = currenciesPagingRepository
+        .createCurrenciesPagingStream()
+        .cachedIn(viewModelScope)
 
     init {
         fetchCurrenciesActionFlow
