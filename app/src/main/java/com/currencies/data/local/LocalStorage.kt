@@ -1,14 +1,16 @@
 package com.currencies.data.local
 
 import com.currencies.domain.Currency
+import kotlinx.coroutines.flow.map
 
-class LocalStorage(private val currencyDao: CurrencyDao) {
+class LocalStorage(
+    private val currencyDao: CurrencyDao,
+    private val currencyEntityMapper: CurrencyEntityMapper
+) {
+    fun getCurrencies() = currencyDao.getAll().map { currencyEntityMapper.mapFromEntity(it) }
 
-    fun fetchCurrencies() = currencyDao.getAll().map { Currency(it.name, it.rate) }
-
-    fun replaceCurrencies(currencies: List<Currency>) =
-        currencies.map { CurrencyEntity(it.name, it.rate) }
-            .also {
-                currencyDao.insertAll(it)
-            }
+    fun replaceCurrencies(currencies: List<Currency>) = currencyEntityMapper.mapToEntity(currencies)
+        .also {
+            currencyDao.insertAll(it)
+        }
 }

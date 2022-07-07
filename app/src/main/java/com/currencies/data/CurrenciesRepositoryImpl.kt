@@ -5,8 +5,9 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import com.currencies.data.local.LocalStorage
 import com.currencies.domain.CurrenciesRepository
+import com.currencies.domain.Currency
 import com.currencies.domain.exception.NoInternetConnectionException
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.Flow
 
 class CurrenciesRepositoryImpl(
     private val remoteStorage: RemoteStorage,
@@ -15,21 +16,20 @@ class CurrenciesRepositoryImpl(
     private val context: Context
 ) : CurrenciesRepository {
 
-    override fun fetchCurrencies(refresh: Boolean) = flow {
-        val requestForbidden = requestFrequencyChecker.isRequestForbidden()
-        if (refresh && requestForbidden || !refresh) {
-            val currencies = localStorage.fetchCurrencies()
-            emit(currencies)
-        }
+    override fun getCurrencies(): Flow<List<Currency>> = localStorage.getCurrencies()
 
-        if (!requestForbidden) {
+    /**
+     * @throws NoInternetConnectionException in case there is no internet.
+     */
+    override suspend fun updateCurrencies() {
+        val requestForbidden = requestFrequencyChecker.isRequestForbidden()
+        if (requestForbidden.not()) {
             if (!isOnline()) {
                 throw NoInternetConnectionException()
             }
             val currencies = remoteStorage.fetchCurrencies()
             requestFrequencyChecker.requestDone()
             localStorage.replaceCurrencies(currencies)
-            emit(currencies)
         }
     }
 

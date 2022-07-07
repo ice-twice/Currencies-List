@@ -17,12 +17,13 @@ import com.currencies.domain.Currency
 import com.currencies.ui.currencieslist.adapter.CurrenciesAdapter
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class CurrenciesListFragment : Fragment() {
     private var _binding: CurrenciesListFragmentBinding? = null
@@ -69,7 +70,7 @@ class CurrenciesListFragment : Fragment() {
 
                 launch {
                     uiState
-                        .distinctUntilChangedBy { it.currencies }
+                        .distinctUntilChangedBy { it.currencies } // may be slow
                         .collect { uiState ->
                             currenciesAdapter.submitList(uiState.currencies)
                         }
@@ -88,7 +89,7 @@ class CurrenciesListFragment : Fragment() {
         }
 
     private fun initializeSwipeRefresh() =
-        binding.swipeToRefresh.setOnRefreshListener { currenciesListViewModel.onFetchCurrencies(true) }
+        binding.swipeToRefresh.setOnRefreshListener { currenciesListViewModel.onUpdateCurrencies() }
 
     override fun onDestroyView() {
         super.onDestroyView()

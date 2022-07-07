@@ -2,7 +2,8 @@ package com.currencies.ui.currencieslist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.currencies.domain.FetchCurrenciesUseCase
+import com.currencies.domain.GetCurrenciesUseCase
+import com.currencies.domain.UpdateCurrenciesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -12,43 +13,46 @@ import javax.inject.Inject
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class CurrenciesListViewModel @Inject constructor(
-    private val fetchCurrenciesUseCase: FetchCurrenciesUseCase
+    private val getCurrenciesUseCase: GetCurrenciesUseCase,
+    private val updateCurrenciesUseCase: UpdateCurrenciesUseCase
 ) : ViewModel() {
     val uiState = MutableStateFlow(CurrenciesListUiState())
-    private val fetchCurrenciesActionFlow = MutableSharedFlow<Boolean>()
+    private val updateCurrenciesActionFlow = MutableSharedFlow<Unit>()
 
     init {
-        fetchCurrenciesActionFlow
-            .onStart {
-                emit(false)
-            }
-            .onEach {
-                uiState.value = uiState.value.copy(isLoading = true)
-            }
-            .flatMapLatest { refresh ->
-                fetchCurrenciesUseCase.fetchCurrencies(refresh)
-                    .catch { error ->
-                        uiState.update {
-                            it.copy(error = error.toString())
-                        }
-                    }
-                    .onCompletion {
-                        uiState.update {
-                            it.copy(isLoading = false)
-                        }
-                    }
-            }
-            .onEach { currencies ->
+        viewModelScope.launch {
+            getCurrenciesUseCase().collect { currencies ->
                 uiState.update {
                     it.copy(currencies = currencies)
                 }
             }
+        }
+
+        // this code can be written in imperative style. this is used only for example and can be
+        // useful for some complex cases.
+        updateCurrenciesActionFlow
+            .onStart { emit(Unit) }
+            .onEach {
+                uiState.value = uiState.value.copy(isLoading = true)
+            }
+            .onEach {
+                try {
+                    updateCurrenciesUseCase()
+                } catch (e: Exception) {
+                    uiState.update {
+                        it.copy(error = e.toString())
+                    }
+                }
+            }
+            .onEach {
+                uiState.value = uiState.value.copy(isLoading = false)
+            }
             .shareIn(viewModelScope, SharingStarted.Eagerly, 0)
     }
 
-    fun onFetchCurrencies(refresh: Boolean = false) {
+    fun onUpdateCurrencies() {
         viewModelScope.launch {
-            fetchCurrenciesActionFlow.emit(refresh)
+            updateCurrenciesActionFlow.emit(Unit)
         }
     }
 
