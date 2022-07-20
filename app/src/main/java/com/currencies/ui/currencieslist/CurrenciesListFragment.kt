@@ -1,7 +1,5 @@
 package com.currencies.ui.currencieslist
 
-import android.app.SearchManager
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.currencies.databinding.CurrenciesListFragmentBinding
 import com.currencies.domain.Currency
@@ -43,17 +42,20 @@ class CurrenciesListFragment : Fragment() {
 
     private fun setupAdapter() {
         val onCurrencyClickedListener: (Currency) -> Unit =
-            { currency -> searchForCurrencyName(currency.name) }
+            { currency -> showCurrencyDetailsScreen(currency) }
         currenciesAdapter = CurrenciesAdapter(onCurrencyClickedListener)
         binding.currenciesList.adapter = currenciesAdapter
         val decoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
         binding.currenciesList.addItemDecoration(decoration)
     }
 
-    private fun searchForCurrencyName(currencyName: String) {
-        val intent = Intent(Intent.ACTION_WEB_SEARCH)
-        intent.putExtra(SearchManager.QUERY, currencyName)
-        startActivity(intent)
+    private fun showCurrencyDetailsScreen(currency: Currency) {
+        val direction =
+            CurrenciesListFragmentDirections.actionWelcomeFragmentToCurrencyDetailsFragment(
+                currency.name,
+                currency.rate
+            )
+        findNavController().navigate(direction)
     }
 
     private fun observeUiState() =
