@@ -6,6 +6,8 @@ import android.net.NetworkCapabilities
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
 import com.currencies.data.local.LocalStorage
+import com.currencies.data.remote.RemoteRequestFrequencyChecker
+import com.currencies.data.remote.RemoteStorage
 import com.currencies.data.worker.RefreshCurrenciesWorker
 import com.currencies.domain.CurrenciesRepository
 import com.currencies.domain.Currency

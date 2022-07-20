@@ -1,7 +1,7 @@
 package com.currencies.ui.di.data
 
 import android.content.Context
-import com.currencies.data.RemoteRequestFrequencyChecker
+import com.currencies.data.remote.RemoteRequestFrequencyChecker
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

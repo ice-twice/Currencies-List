@@ -17,9 +17,7 @@ import com.currencies.ui.currencieslist.adapter.CurrenciesAdapter
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
@@ -62,31 +60,28 @@ class CurrenciesListFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 val uiState = currenciesListViewModel.uiState
-                launch {
-                    uiState
-                        .distinctUntilChangedBy { it.isLoading }
-                        .collect { uiState ->
-                            binding.swipeToRefresh.isRefreshing = uiState.isLoading
-                        }
-                }
+                uiState
+                    .distinctUntilChangedBy { it.isLoading }
+                    .onEach {
+                        binding.swipeToRefresh.isRefreshing = it.isLoading
+                    }
+                    .launchIn(this)
 
-                launch {
-                    uiState
-                        .distinctUntilChangedBy { it.currencies } // may be slow
-                        .collect { uiState ->
-                            currenciesAdapter.submitList(uiState.currencies)
-                        }
-                }
+                uiState
+                    .distinctUntilChangedBy { it.currencies } // may be slow
+                    .onEach {
+                        currenciesAdapter.submitList(it.currencies)
+                    }
+                    .launchIn(this)
 
-                launch {
-                    uiState
-                        .map { it.error }
-                        .filterNotNull()
-                        .collect { error ->
-                            Snackbar.make(binding.root, error, Snackbar.LENGTH_SHORT).show()
-                            currenciesListViewModel.onErrorShowed()
-                        }
-                }
+                uiState
+                    .map { it.error }
+                    .filterNotNull()
+                    .onEach {
+                        Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
+                        currenciesListViewModel.onErrorShowed()
+                    }
+                    .launchIn(this)
             }
         }
 

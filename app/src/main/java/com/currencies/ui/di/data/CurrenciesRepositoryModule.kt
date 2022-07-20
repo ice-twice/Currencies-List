@@ -2,8 +2,8 @@ package com.currencies.ui.di.data
 
 import android.content.Context
 import com.currencies.data.CurrenciesRepositoryImpl
-import com.currencies.data.RemoteRequestFrequencyChecker
-import com.currencies.data.RemoteStorage
+import com.currencies.data.remote.RemoteRequestFrequencyChecker
+import com.currencies.data.remote.RemoteStorage
 import com.currencies.data.local.LocalStorage
 import com.currencies.domain.CurrenciesRepository
 import dagger.Module

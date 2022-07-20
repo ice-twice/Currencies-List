@@ -1,4 +1,4 @@
-package com.currencies.data
+package com.currencies.data.remote
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit

@@ -1,4 +1,4 @@
-package com.currencies.data
+package com.currencies.data.remote
 
 import com.currencies.domain.Currency
 import com.currencies.domain.exception.FetchCurrenciesDataException
