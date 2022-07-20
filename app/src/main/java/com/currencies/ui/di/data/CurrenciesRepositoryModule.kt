@@ -1,29 +1,30 @@
-package com.currencies.ui.di
+package com.currencies.ui.di.data
 
 import android.content.Context
 import com.currencies.data.CurrenciesRepositoryImpl
 import com.currencies.data.RemoteRequestFrequencyChecker
 import com.currencies.data.RemoteStorage
 import com.currencies.data.local.LocalStorage
+import com.currencies.domain.CurrenciesRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.android.scopes.ActivityRetainedScoped
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
-@InstallIn(ActivityRetainedComponent::class)
+@InstallIn(SingletonComponent::class)
 class CurrenciesRepositoryModule {
 
-    @ActivityRetainedScoped
+    @Singleton
     @Provides
     fun provide(
         remoteStorage: RemoteStorage,
         remoteRequestFrequencyChecker: RemoteRequestFrequencyChecker,
         localStorage: LocalStorage,
         @ApplicationContext context: Context
-    ) = CurrenciesRepositoryImpl(
+    ): CurrenciesRepository = CurrenciesRepositoryImpl(
         remoteStorage,
         localStorage,
         remoteRequestFrequencyChecker,

@@ -6,8 +6,9 @@ import com.currencies.domain.exception.ParseCurrenciesDataException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
+import javax.inject.Inject
 
-class RemoteStorage {
+class RemoteStorage @Inject constructor() {
 
     fun fetchCurrencies(): List<Currency> {
         val document: Document

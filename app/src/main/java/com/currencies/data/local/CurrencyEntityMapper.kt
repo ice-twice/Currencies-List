@@ -1,8 +1,9 @@
 package com.currencies.data.local
 
 import com.currencies.domain.Currency
+import javax.inject.Inject
 
-class CurrencyEntityMapper {
+class CurrencyEntityMapper @Inject constructor() {
     fun mapFromEntity(list: List<CurrencyEntity>): List<Currency> =
         list.map { Currency(it.name, it.rate) }
 

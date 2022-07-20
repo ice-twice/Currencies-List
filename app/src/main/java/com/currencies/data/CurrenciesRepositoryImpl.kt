@@ -3,7 +3,10 @@ package com.currencies.data
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.WorkManager
 import com.currencies.data.local.LocalStorage
+import com.currencies.data.worker.RefreshCurrenciesWorker
 import com.currencies.domain.CurrenciesRepository
 import com.currencies.domain.Currency
 import com.currencies.domain.exception.NoInternetConnectionException
@@ -18,9 +21,6 @@ class CurrenciesRepositoryImpl(
 
     override fun getCurrencies(): Flow<List<Currency>> = localStorage.getCurrencies()
 
-    /**
-     * @throws NoInternetConnectionException in case there is no internet.
-     */
     override suspend fun updateCurrencies() {
         val requestForbidden = requestFrequencyChecker.isRequestForbidden()
         if (requestForbidden.not()) {
@@ -40,5 +40,13 @@ class CurrenciesRepositoryImpl(
         val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
         return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
                 || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+    }
+
+    override fun refreshCurrenciesPeriodically() {
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            RefreshCurrenciesWorker.NAME,
+            ExistingPeriodicWorkPolicy.KEEP,
+            RefreshCurrenciesWorker.makeRequest()
+        )
     }
 }

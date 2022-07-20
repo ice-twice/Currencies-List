@@ -3,7 +3,7 @@ package com.currencies.domain
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
-class UpdateCurrenciesUseCase(
+class RefreshCurrenciesUseCase(
     private val currenciesRepository: CurrenciesRepository,
     private val backgroundDispatcher: CoroutineDispatcher
 ) {

@@ -5,14 +5,25 @@ import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.os.StrictMode.VmPolicy
 import androidx.fragment.app.strictmode.FragmentStrictMode
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import com.currencies.BuildConfig
+import com.currencies.domain.RefreshCurrenciesPeriodicallyUseCase
 import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 
 @HiltAndroidApp
-class App : Application() {
+class App : Application(), Configuration.Provider {
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
+
+    @Inject
+    lateinit var refreshCurrenciesPeriodicallyUseCase: RefreshCurrenciesPeriodicallyUseCase
+
     override fun onCreate() {
         setupStrictMode()
         super.onCreate()
+        refreshCurrenciesPeriodicallyUseCase()
     }
 
     private fun setupStrictMode() {
@@ -40,4 +51,9 @@ class App : Application() {
                 .build()
         }
     }
+
+    override fun getWorkManagerConfiguration() =
+        Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 }

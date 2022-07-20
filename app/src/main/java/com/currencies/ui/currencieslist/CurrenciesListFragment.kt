@@ -89,7 +89,7 @@ class CurrenciesListFragment : Fragment() {
         }
 
     private fun initializeSwipeRefresh() =
-        binding.swipeToRefresh.setOnRefreshListener { currenciesListViewModel.onUpdateCurrencies() }
+        binding.swipeToRefresh.setOnRefreshListener { currenciesListViewModel.onRefreshCurrencies() }
 
     override fun onDestroyView() {
         super.onDestroyView()

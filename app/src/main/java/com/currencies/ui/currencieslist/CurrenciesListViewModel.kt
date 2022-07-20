@@ -3,7 +3,7 @@ package com.currencies.ui.currencieslist
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.currencies.domain.GetCurrenciesUseCase
-import com.currencies.domain.UpdateCurrenciesUseCase
+import com.currencies.domain.RefreshCurrenciesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -14,10 +14,10 @@ import javax.inject.Inject
 @HiltViewModel
 class CurrenciesListViewModel @Inject constructor(
     private val getCurrenciesUseCase: GetCurrenciesUseCase,
-    private val updateCurrenciesUseCase: UpdateCurrenciesUseCase
+    private val refreshCurrenciesUseCase: RefreshCurrenciesUseCase
 ) : ViewModel() {
     val uiState = MutableStateFlow(CurrenciesListUiState())
-    private val updateCurrenciesActionFlow = MutableSharedFlow<Unit>()
+    private val refreshCurrenciesActionFlow = MutableSharedFlow<Unit>()
 
     init {
         viewModelScope.launch {
@@ -30,14 +30,14 @@ class CurrenciesListViewModel @Inject constructor(
 
         // this code can be written in imperative style. this is used only for example and can be
         // useful for some complex cases.
-        updateCurrenciesActionFlow
+        refreshCurrenciesActionFlow
             .onStart { emit(Unit) }
             .onEach {
                 uiState.value = uiState.value.copy(isLoading = true)
             }
             .onEach {
                 try {
-                    updateCurrenciesUseCase()
+                    refreshCurrenciesUseCase()
                 } catch (e: Exception) {
                     uiState.update {
                         it.copy(error = e.toString())
@@ -50,9 +50,9 @@ class CurrenciesListViewModel @Inject constructor(
             .shareIn(viewModelScope, SharingStarted.Eagerly, 0)
     }
 
-    fun onUpdateCurrencies() {
+    fun onRefreshCurrencies() {
         viewModelScope.launch {
-            updateCurrenciesActionFlow.emit(Unit)
+            refreshCurrenciesActionFlow.emit(Unit)
         }
     }
 

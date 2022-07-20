@@ -1,4 +1,4 @@
-package com.currencies.ui.di
+package com.currencies.ui.di.data
 
 import com.currencies.data.local.CurrencyDatabase
 import com.currencies.data.local.CurrencyEntityMapper
@@ -6,14 +6,14 @@ import com.currencies.data.local.LocalStorage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityRetainedComponent
-import dagger.hilt.android.scopes.ActivityRetainedScoped
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
-@InstallIn(ActivityRetainedComponent::class)
+@InstallIn(SingletonComponent::class)
 class LocalStorageModule {
 
-    @ActivityRetainedScoped
+    @Singleton
     @Provides
     fun provide(currencyDatabase: CurrencyDatabase, currencyEntityMapper: CurrencyEntityMapper) =
         LocalStorage(currencyDatabase.currencyDao(), currencyEntityMapper)
