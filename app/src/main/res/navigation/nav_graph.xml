@@ -15,7 +15,8 @@
     <fragment
         android:id="@+id/currencyDetailsFragment"
         android:name="com.currencies.ui.currencydetails.CurrencyDetailsFragment"
-        android:label="CurrencyDetailsFragment">
+        android:label="CurrencyDetailsFragment"
+        tools:layout="@layout/currency_details_fragment">
         <argument
             android:name="currencyName"
             app:argType="string" />
