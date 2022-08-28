@@ -1,2 +1,3 @@
 rootProject.name = "CurrenciesApp"
 include ':app'
+include ':feature-currency'

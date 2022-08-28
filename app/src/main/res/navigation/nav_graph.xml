@@ -1,27 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/welcome_fragment">
-    <fragment
-        android:id="@+id/welcome_fragment"
-        android:name="com.currencies.ui.currencieslist.CurrenciesListFragment"
-        android:label="WelcomeFragment"
-        tools:layout="@layout/currencies_list_fragment">
-        <action
-            android:id="@+id/action_welcome_fragment_to_currencyDetailsFragment"
-            app:destination="@id/currencyDetailsFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/currencyDetailsFragment"
-        android:name="com.currencies.ui.currencydetails.CurrencyDetailsFragment"
-        android:label="CurrencyDetailsFragment"
-        tools:layout="@layout/currency_details_fragment">
-        <argument
-            android:name="currencyName"
-            app:argType="string" />
-        <argument
-            android:name="currencyRate"
-            app:argType="float" />
-    </fragment>
+<navigation xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:startDestination="@id/navigation_currency">
+
+    <include app:graph="@navigation/nav_graph_currency" />
 </navigation>
