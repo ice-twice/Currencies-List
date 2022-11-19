@@ -12,6 +12,7 @@ import com.currencies.feature.currency.data.worker.RefreshCurrenciesWorker
 import com.currencies.feature.currency.domain.CurrenciesRepository
 import com.currencies.feature.currency.domain.Currency
 import com.currencies.feature.currency.domain.exception.NoInternetConnectionException
+import com.currencies.feature.currency.domain.extensions.foldSuccess
 import kotlinx.coroutines.flow.Flow
 
 class CurrenciesRepositoryImpl(
@@ -23,15 +24,22 @@ class CurrenciesRepositoryImpl(
 
     override fun getCurrencies(): Flow<List<Currency>> = localStorage.getCurrencies()
 
-    override suspend fun updateCurrencies() {
+    override suspend fun updateCurrencies(): Result<Unit> {
         val requestForbidden = requestFrequencyChecker.isRequestForbidden()
-        if (requestForbidden.not()) {
-            if (!isOnline()) {
-                throw NoInternetConnectionException()
+        return if (requestForbidden) {
+            Result.success(Unit)
+        } else {
+            if (isOnline().not()) {
+                Result.failure(NoInternetConnectionException())
+            } else {
+                remoteStorage.fetchCurrencies().foldSuccess(
+                    onSuccess = { currencies ->
+                        requestFrequencyChecker.requestDone()
+                        localStorage.replaceCurrencies(currencies)
+                        Unit
+                    }
+                )
             }
-            val currencies = remoteStorage.fetchCurrencies()
-            requestFrequencyChecker.requestDone()
-            localStorage.replaceCurrencies(currencies)
         }
     }
 

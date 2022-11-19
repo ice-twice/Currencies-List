@@ -11,7 +11,7 @@ import com.currencies.feature.currency.domain.RefreshCurrenciesPeriodicallyUseCa
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
-//  TODO share build logic between modules https://docs.gradle.org/current/userguide/platforms.html
+//  TODO share build logic between modules https://docs.gradle.org/current/userguide/platforms.html Version Catalog
 
 @HiltAndroidApp
 class App : Application(), Configuration.Provider {

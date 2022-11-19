@@ -16,8 +16,8 @@ class RefreshCurrenciesWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
-        currenciesRepository.updateCurrencies()
-        return Result.success()
+        return currenciesRepository.updateCurrencies()
+            .fold({ Result.success() }, { Result.failure() })
     }
 
     companion object {

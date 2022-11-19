@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.currencies.feature.currency.domain.GetCurrenciesUseCase
 import com.currencies.feature.currency.domain.RefreshCurrenciesUseCase
-import com.currencies.feature.currency.domain.tryCancellable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -37,9 +36,8 @@ class CurrenciesListViewModel @Inject constructor(
                 uiState.value = uiState.value.copy(isLoading = true)
             }
             .onEach {
-                tryCancellable {
-                    refreshCurrenciesUseCase()
-                }.onFailure { e ->
+                val updateResult = refreshCurrenciesUseCase()
+                updateResult.onFailure { e ->
                     uiState.update {
                         it.copy(error = e.toString())
                     }

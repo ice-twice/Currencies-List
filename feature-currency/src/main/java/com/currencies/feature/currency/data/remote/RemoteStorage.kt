@@ -3,6 +3,7 @@ package com.currencies.feature.currency.data.remote
 import com.currencies.feature.currency.domain.Currency
 import com.currencies.feature.currency.domain.exception.FetchCurrenciesDataException
 import com.currencies.feature.currency.domain.exception.ParseCurrenciesDataException
+import com.currencies.feature.currency.domain.extensions.foldSuccess
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
@@ -10,21 +11,20 @@ import javax.inject.Inject
 
 class RemoteStorage @Inject constructor() {
 
-    fun fetchCurrencies(): List<Currency> {
-        val document: Document
-        try {
-            @Suppress("BlockingMethodInNonBlockingContext")
-            document = Jsoup.connect(URL).get()
+    fun fetchCurrencies(): Result<List<Currency>> {
+        val documentResult: Result<Document> = try {
+            Result.success(Jsoup.connect(URL).get())
         } catch (e: Exception) {
-            throw FetchCurrenciesDataException()
+            Result.failure(FetchCurrenciesDataException())
         }
-
-        try {
-            val currenciesData = document.select("table[id^=crypto_currencies_]")
-            return (map(currenciesData))
-        } catch (e: Exception) {
-            throw ParseCurrenciesDataException()
-        }
+        return documentResult.foldSuccess(
+            onSuccess = { document ->
+                val currenciesData = document.select("table[id^=crypto_currencies_]")
+                map(currenciesData)
+            },
+            onSuccessFailed = {
+                ParseCurrenciesDataException()
+            })
     }
 
     private fun map(currenciesData: Elements) = currenciesData.map {

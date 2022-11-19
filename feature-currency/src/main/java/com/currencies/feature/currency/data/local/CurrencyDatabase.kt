@@ -16,6 +16,8 @@ abstract class CurrencyDatabase : RoomDatabase() {
             context,
             CurrencyDatabase::class.java,
             DB_NAME
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 }
